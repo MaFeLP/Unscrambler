@@ -33,3 +33,7 @@
 
 # IntelliJ aka. CLion files
 .idea/
+
+
+# Build output directory
+cmake-build-debug/
