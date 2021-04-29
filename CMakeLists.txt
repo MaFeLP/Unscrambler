@@ -7,4 +7,11 @@ include_directories(.)
 
 add_executable(Unscrambler
         Main.cpp
-        Main.h)
+        Main.h
+        Colors.h
+        Runner.cpp
+        Runner.h
+        SpellChecker.cpp
+        SpellChecker.h
+        Combinations.cpp
+        Combinations.h)

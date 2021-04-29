@@ -6,5 +6,6 @@
 #define UNSCRAMBLER_MAIN_H
 
 int main(int argc, const char* argv[]);
+void printHelpMessage();
 
 #endif //UNSCRAMBLER_MAIN_H
