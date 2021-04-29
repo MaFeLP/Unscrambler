@@ -18,7 +18,7 @@ void Runner::calculate(const unsigned long start, const unsigned long end, const
     auto _correctWords = new vector<string> {};
 
     if (end >= inputWords.capacity()) {
-        cout << Colors::RED << "Error running calculate! The end point is bigger than the overall capacity of the combinations!";
+        cout << Colors::RED << "Error running calculate! The end point is bigger than the overall capacity of the _combinations!";
     }
 
     for (ulong i = 0; i <= end; ++i) {

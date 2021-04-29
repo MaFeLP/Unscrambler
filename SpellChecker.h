@@ -14,6 +14,8 @@ Website: www.lordhypersonic.blogspot.com
 */
 #ifndef UNSCRAMBLER_SPELLCHECKER_H
 #include <string>
+#include <vector>
+
 #define UNSCRAMBLER_SPELLCHECKER_H
 
 
@@ -28,7 +30,7 @@ public:
 
     static int mixedExtraMissing(std::string input);
 
-    static bool isCorrect(std::string word);
+    static bool isCorrect(const std::string &word, const std::vector<std::string> &dict);
 };
 
 

@@ -5,32 +5,26 @@
 #include "Combinations.h"
 #include <vector>
 #include <string>
+#include <iostream>
 
 using std::string;
 using std::vector;
+using std::cout;
+using std::endl;
 
-vector<string> Combinations::allCombinations(const string input) {
-    vector<string> out{};
+void Combinations::compute(const string& input, const string& result) {
+    if (result.length() == _size) {
+        _combinations.push_back(result);
 
-    for (auto iter = input.begin(); iter < input.end(); ++iter) {
-        _chars.push_back(*iter);
-
+        // cout << result << endl;
     }
 
-    for (auto iter = _chars.begin(); iter < _chars.end(); ++iter) {
-        vector<char> i = _chars;
-        i.erase(iter);
+    for( int i = 0; i < input.length(); i++ )
+        compute(string(input).erase(i, 1), result + input[i]);
+}
 
-        string next{};
-
-        for (auto iter2 = i.begin(); iter2 < i.end(); ++iter2) {
-            next.push_back(*iter2);
-        }
-
-        auto comb = new Combinations{};
-        auto insertable = comb->allCombinations(next);
-        out.insert(out.end(), insertable.begin(), insertable.end());
-    }
-
-    return out;
+std::vector<std::string> Combinations::allCombinations(const string& input) {
+    _size = input.length();
+    compute(input,"");
+    return _combinations;
 }

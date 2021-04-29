@@ -10,9 +10,11 @@
 #include <vector>
 
 class Combinations {
-    std::vector<char> _chars;
+    std::vector<std::string> _combinations;
+    unsigned _size;
+    void compute(const std::string &input, const std::string &result);
 public:
-    std::vector<std::string> allCombinations(std::string input);
+    std::vector<std::string> allCombinations(const std::string&);
 };
 
 

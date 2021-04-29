@@ -1,2 +1,2 @@
 # Unscrabler
-A C++ Program to unscrable and check words
+A C++ Program to unscrable and check scrambled_word

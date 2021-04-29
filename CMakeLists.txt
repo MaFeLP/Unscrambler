@@ -14,4 +14,7 @@ add_executable(Unscrambler
         SpellChecker.cpp
         SpellChecker.h
         Combinations.cpp
-        Combinations.h)
+        Combinations.h
+        github/progress_bar.cpp
+        github/progress_bar.hpp
+        )

@@ -3,6 +3,7 @@
 //
 
 #include "SpellChecker.h"
+#include "Main.h"
 
 #include <iostream>
 #include <string>
@@ -13,14 +14,21 @@ using std::string;
 using std::cout;
 using std::cin;
 using std::ifstream;
+using std::vector;
 using std::endl;
 
 
 //lower case alphabets.
 char lower_alpha[] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
-bool SpellChecker::isCorrect(const string word) {
-
+bool SpellChecker::isCorrect(const string& word, const vector<string> &dict) {
+    for (auto iter = dict.begin(); iter < dict.end(); ++iter) {
+        if (word == *iter) {
+            return true;
+        } else {
+            cout;
+        }
+    }
 
     return false;
 }
@@ -241,10 +249,10 @@ int main()
         len = input.length();
         for (int i=0; i < len; i++)
             tolower(input[i]);
-        ifstream words ("words.txt");
-        if(words)
+        ifstream scrambled_word ("scrambled_word.txt");
+        if(scrambled_word)
         {
-            while (getline(words,line))
+            while (getline(scrambled_word,line))
             {
                 flen = line.length();
                 if (len==flen)
@@ -257,7 +265,7 @@ int main()
                 }
                 else continue;
             }
-            words.close();
+            scrambled_word.close();
             if (correct==1)
             {
                 cout<<endl<<"Spelling is correct"<<endl;
@@ -279,7 +287,7 @@ int main()
         }
         else
         {
-            cout<<"Not able to open words.txt"<<endl;
+            cout<<"Not able to open scrambled_word.txt"<<endl;
         }
         cout<<endl<<"Press any key to continue..."<<endl<<endl;
         _getch();
