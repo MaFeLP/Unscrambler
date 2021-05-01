@@ -19,17 +19,7 @@ Website: www.lordhypersonic.blogspot.com
 #define UNSCRAMBLER_SPELLCHECKER_H
 
 
-class SpellChecker {
-public:
-    static int incorrectArrangement(std::string input);
-    static int exchangedCharacters (std::string input);
-
-    static int missingCharacter(std::string input);
-
-    static int extraCharacter(std::string input);
-
-    static int mixedExtraMissing(std::string input);
-
+struct SpellChecker {
     static bool isCorrect(const std::string &word, const std::vector<std::string> &dict);
 };
 

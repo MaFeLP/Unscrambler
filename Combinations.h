@@ -10,7 +10,9 @@
 #include <vector>
 
 class Combinations {
+    /// All the combinations found by the algorithm
     std::vector<std::string> _combinations;
+    /// The size of the inputted string.
     unsigned _size;
     void compute(const std::string &input, const std::string &result);
 public:

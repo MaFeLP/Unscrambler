@@ -11,10 +11,8 @@
 #include <vector>
 #include <fstream>
 #include <thread>
-#include <atomic>
 #include "SpellChecker.h"
 #include "Combinations.h"
-#include "github/progress_bar.hpp"
 
 using std::cout;
 using std::cin;
@@ -23,39 +21,17 @@ using std::vector;
 using std::thread;
 
 int main(const int argc, const char* argv[]) {
-    struct winsize w{};
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-    std::cout << "cols: " << w.ws_col << "; rows: " << w.ws_row << std::endl;
-
-    Variables::terminalColumns = w.ws_col;
-    Variables::terminalRows = w.ws_row;
-
-    /*
-    if (debug) {
-        for (int i = 0; i < argc; ++i) {
-            const char* arg = argv[i];
-
-            std::cout << "Argument " << i << ": " << arg << "\combinationsNumber";
-        }
-    }
-
-    if (argc == 1) {
-        printHelpMessage();
-        return 1;
-    }
-    */
-
+    // Ask the user for the word to unscramble.
     cout << "Please enter the word to unscramble: ";
     cin >> Variables::scrambledWord;
-    cout << Colors::CYAN << Colors::RESET << Colors::EFFECT_BOLD << "Now checking word combinations for \""
+    cout << Colors::CYAN << ":: " << Colors::RESET << Colors::EFFECT_BOLD << "Now checking word combinations for \""
          << Colors::DARK_GRAY << Variables::scrambledWord << Colors::RESET << Colors::EFFECT_BOLD << "\"...\n";
 
     cout << Colors::CYAN << ":: " << Colors::RESET << Colors::EFFECT_BOLD << "Reading in words.txt file...\n" << Colors::RESET;
 
+    // Read the file words.txt in to the vector "english words".
     std::ifstream wordsFile;
     wordsFile.open("../words.txt", std::ios::out);
-
     if (wordsFile.is_open()) {
         string line;
         while (getline(wordsFile, line)) {
@@ -66,98 +42,87 @@ int main(const int argc, const char* argv[]) {
         return 1;
     }
 
-
+    // Display information about the words in the vector "english words".
     cout    << Colors::GREEN << ":: " << Colors::LIGHT_GRAY << "words.txt " << Colors::RESET << "read in!\n"
             << Colors::YELLOW << ":: " << Colors::RESET << "words.txt contains "
             << Colors::EFFECT_UNDERLINED << Colors::LIGHT_GRAY << englishWords.capacity()
             << Colors::RESET_UNDERLINED << Colors::RESET << " words!"
-            << "\n\n"
-            << "Please enter the number of threads to work with: ";
+            << "\n";
+            //<< "Please enter the number of threads to work with: ";
 
-    int numberOfThreads = 0;
-    cin >> numberOfThreads;
-
+    // Ask the user for the number of threads he/she wants to use: currently not available!
+    int numberOfThreads = 1;
+/*    cin >> numberOfThreads;
     cout    << "\n"
             << Colors::YELLOW << ":: " << Colors::RESET << "Using "
             << Colors::LIGHT_GRAY << numberOfThreads
             << Colors::RESET << " threads."
-            << "\n\n";
+            << "\n\n"; */
 
-//    for (auto it = scrambled_word.begin(); it < scrambled_word.end(); ++it)
-//        cout << *it;
-
+    // Creates all possible combinations.
     auto combinations = new Combinations{};
     auto allCombinations = combinations->allCombinations(Variables::scrambledWord);
 
-    // Initialises the progress bar.
+    // Initialises the progress bar, used in the runner class.
     int combinationsNumber = allCombinations.size();
-
     processed = 0;
 
-
-    cout << "\n\n";
-
-    //SpellChecker::incorrectArrangement(scrambled_word);
-
+    // does some preparation work for the splitting of work in the threads.
     int wordsPerThread = combinationsNumber / numberOfThreads;
-
     if (wordsPerThread == 0) {
         numberOfThreads = 0;
         wordsPerThread = combinationsNumber;
     }
 
-    /*
-    auto currentWord = allCombinations.begin();
-
-    vector<thread> _threads;
-    for (int i = 0; i < numberOfThreads; ++i) {
-        vector<string> parameter{};
-
-        for (int ii = 0; ii < (i + 1) * numberOfThreads; ++ii) {
-            parameter.push_back(*currentWord);
-            ++currentWord;
-        }
-
-        thread t(Runner::calculateWithoutProgressBar, parameter);
-        t.join();
-    } */
-
+    // Initializes and starts the threads.
     vector<Runner *> runners{};
-
     for (int i = 0; i < numberOfThreads; ++i) {
+        // Creates a sublist of combinations of the words, each individual thread should handle.
         vector<string> wordsCombinations{allCombinations.begin(), allCombinations.begin() + ((i + 1) * (wordsPerThread))};
+        // Creates a runner with this list (handles the threads).
         auto *runner = new Runner(englishWords, wordsCombinations, combinationsNumber);
+        // Start the prepared thread.
         runner->start();
-
+        // Add this thread to the vector of thread pointers.
         runners.push_back(runner);
     }
 
+    // Initializes the vector of correct english words, each thread has gathered.
     vector<string> correctEnglishWordFromScrambled{};
+    // Wait for all threads to finish.
     for (auto runnerItem = runners.begin(); runnerItem < runners.end(); ++runnerItem) {
+        // Waits for the current thread to finish.
         auto r = *runnerItem;
         r->waitForFinish();
-
+        // When the thread has finished, get all its correct words and add them to the list of correct words.
         auto correctWordsFromThread = r->getCorrectWords();
         for (auto wordItem = correctWordsFromThread.begin(); wordItem < correctWordsFromThread.end(); ++wordItem) {
             correctEnglishWordFromScrambled.push_back(*wordItem);
         }
     }
 
-    cout << Colors::GREEN
-         << "\n\n";
+    // Print the results
+    cout << "\n"
+         << Colors::GREEN << ":: " << Colors::RESET
+         << Colors::EFFECT_BOLD << "Done!" << Colors::RESET_BOLD << "\n"
+         << Colors::GREEN << ":: " << Colors::RESET
+         << Colors::EFFECT_BOLD << "All possible matches found!" << Colors::RESET_BOLD
+         << "\n";
     for (auto item = correctEnglishWordFromScrambled.begin(); item < correctEnglishWordFromScrambled.end(); ++item) {
-        cout << *item;
-
+        cout << Colors::LIGHT_BLUE << *item << Colors::RESET;
+        // If the item is not the last in its line, print a semicolon.
         if (item != correctEnglishWordFromScrambled.end() - 1) {
             cout << "; ";
         }
     }
 
-    cout << std::endl;
+    cout << "\n"
+         << Colors::GREEN << ":: " << Colors::RESET
+         << Colors::EFFECT_BOLD << "Exiting" << Colors::EFFECT_BLINK <<  "...\n" << Colors::RESET_BOLD << Colors::RESET_BLINK
+         << Colors::LIGHT_GRAY << "Unscrambler made by MaFeLP (https://mafelp.githu.io/)!"
+                               << "\nThanks for using it!"
+         << Colors::RESET
+         << std::endl;
 
     return 0;
-}
-
-void printHelpMessage() {
-    cout << Colors::RED << "Help message" << std::endl;
 }
