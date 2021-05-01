@@ -18,3 +18,5 @@ add_executable(Unscrambler
         github/progress_bar.cpp
         github/progress_bar.hpp
         )
+
+target_link_libraries(Unscrambler pthread)

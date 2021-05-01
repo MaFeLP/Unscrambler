@@ -5,12 +5,14 @@
 #ifndef UNSCRAMBLER_MAIN_H
 #include <string>
 #include <vector>
+#include <atomic>
 #define UNSCRAMBLER_MAIN_H
 
 int main(int argc, const char* argv[]);
 void printHelpMessage();
 
 static std::vector<std::string> englishWords{};
+static std::atomic<unsigned long> processed;
 
 namespace Variables {
     const bool debug = true;

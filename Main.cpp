@@ -4,11 +4,14 @@
 
 #include "Main.h"
 #include "Colors.h"
+#include "Runner.h"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <thread>
+#include <atomic>
 #include "SpellChecker.h"
 #include "Combinations.h"
 #include "github/progress_bar.hpp"
@@ -17,31 +20,7 @@ using std::cout;
 using std::cin;
 using std::string;
 using std::vector;
-
-
-void progress(const unsigned long &current, const unsigned &maximum, const string& label) {
-    // "[] 99.99% "
-
-    string maximumNumberLenght{&"" [ maximum]};
-    int asdfasdf = maximumNumberLenght.length();
-
-    unsigned pl = Variables::terminalColumns / 2 - 9;
-    cout << "\r"
-         << "(";
-
-    for (int i = 0; i < maximum - current; ++i) {
-        cout << " ";
-    }
-
-    cout << current << "/" << maximum << ")";
-
-    for (int i = 0; i < (Variables::terminalColumns - 16 + (6 - 2 * (asdfasdf))); ++i) {
-        cout << " ";
-    }
-
-    cout << "[";
-}
-
+using std::thread;
 
 int main(const int argc, const char* argv[]) {
     struct winsize w{};
@@ -57,7 +36,7 @@ int main(const int argc, const char* argv[]) {
         for (int i = 0; i < argc; ++i) {
             const char* arg = argv[i];
 
-            std::cout << "Argument " << i << ": " << arg << "\n";
+            std::cout << "Argument " << i << ": " << arg << "\combinationsNumber";
         }
     }
 
@@ -87,48 +66,78 @@ int main(const int argc, const char* argv[]) {
         return 1;
     }
 
-    auto asdf = englishWords;
 
     cout    << Colors::GREEN << ":: " << Colors::LIGHT_GRAY << "words.txt " << Colors::RESET << "read in!\n"
             << Colors::YELLOW << ":: " << Colors::RESET << "words.txt contains "
             << Colors::EFFECT_UNDERLINED << Colors::LIGHT_GRAY << englishWords.capacity()
             << Colors::RESET_UNDERLINED << Colors::RESET << " words!"
+            << "\n\n"
+            << "Please enter the number of threads to work with: ";
+
+    int numberOfThreads = 0;
+    cin >> numberOfThreads;
+
+    cout    << "\n"
+            << Colors::YELLOW << ":: " << Colors::RESET << "Using "
+            << Colors::LIGHT_GRAY << numberOfThreads
+            << Colors::RESET << " threads."
             << "\n\n";
 
 //    for (auto it = scrambled_word.begin(); it < scrambled_word.end(); ++it)
 //        cout << *it;
 
-    vector<string> checkedWords{};
-
     auto combinations = new Combinations{};
     auto allCombinations = combinations->allCombinations(Variables::scrambledWord);
 
     // Initialises the progress bar.
-    int n = allCombinations.size();
-    ProgressBar progress_bar(n, "Calculating possible combinations...");
+    int combinationsNumber = allCombinations.size();
 
-    unsigned long jobIndex = 0;
-    string current{};
-    for (auto iter = allCombinations.begin(); iter < allCombinations.end(); ++iter) {
-        current = *iter;
-        if (SpellChecker::isCorrect(current, englishWords)) {
-            //cout << Colors::GREEN << current << Colors::RESET << "\n";
-            checkedWords.push_back(current);
-        }
+    processed = 0;
 
-        progress_bar.Progressed(jobIndex);
-        //progress(i, allCombinations.size(), "adsf");
-
-        ++jobIndex;
-    }
 
     cout << "\n\n";
 
     //SpellChecker::incorrectArrangement(scrambled_word);
 
+    int wordsPerThread = combinationsNumber / numberOfThreads;
+
+    if (wordsPerThread == 0) {
+        numberOfThreads = 0;
+        wordsPerThread = combinationsNumber;
+    }
+
+    /*
+    auto currentWord = allCombinations.begin();
+
+    vector<thread> _threads;
+    for (int i = 0; i < numberOfThreads; ++i) {
+        vector<string> parameter{};
+
+        for (int ii = 0; ii < (i + 1) * numberOfThreads; ++ii) {
+            parameter.push_back(*currentWord);
+            ++currentWord;
+        }
+
+        thread t(Runner::calculateWithoutProgressBar, parameter);
+        t.join();
+    } */
+
+    vector<string> thread1Words{allCombinations.begin(), allCombinations.begin() + (1 * wordsPerThread)};
+    Runner thread1Runner(englishWords, thread1Words, combinationsNumber);
+    thread1Runner.start();
+
+    thread1Runner.waitForFinish();
+    vector<string> thread1Results = thread1Runner.getCorrectWords();
+
     cout << Colors::GREEN;
-    for (auto iter = checkedWords.begin(); iter < checkedWords.end(); ++iter) {
-        cout << *iter << "; ";
+    //for (auto iter = correctWords.begin(); iter < correctWords.end(); ++iter) {
+        //cout << *iter << "; ";
+    //}
+
+    cout << "\n\n";
+
+    for (auto item = thread1Results.begin(); item < thread1Results.end(); ++item) {
+        cout << *item << "; ";
     }
 
     cout << std::endl;
@@ -139,17 +148,3 @@ int main(const int argc, const char* argv[]) {
 void printHelpMessage() {
     cout << Colors::RED << "Help message" << std::endl;
 }
-
-
-/*
- * def progress(i, max, string):
-    width, height = os.get_terminal_size()
-    pl=round(math.log(width/57 ,1.01644658))
-    string=' '+string+200*' '
-    print('\r('+(len(str(max))-len(str(i)))*' '+str(i)+
-    '/'+str(max)+')'
-
-    +string[:width-16+(6-2*len(str(max)))-pl]+
-    '['+round((i/max)*pl)*'#'+(pl-round((i/max)*pl))*'-'+']
-     '+(3-len(str(round((i/max)*100))))*' '+str(round((i/max)*100))+'%', end='', flush=True)
- */

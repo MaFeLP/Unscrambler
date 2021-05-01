@@ -47,7 +47,7 @@ int ProgressBar::GetConsoleWidth(){
         width = csbi.srWindow.Right - csbi.srWindow.Left;
     #else
         struct winsize win;
-        if (ioctl(0, TIOCGWINSZ, &win) == -1) {
+        if (ioctl(0, TIOCGWINSZ, &win) == -1 || ioctl(0, TIOCGWINSZ, &win) == 0) {
             width = DEFAULT_WIDTH;
         } else {
             width = win.ws_col;

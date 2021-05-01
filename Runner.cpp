@@ -3,31 +3,75 @@
 //
 
 #include "Runner.h"
-#include "Colors.h"
+#include "Main.h"
+#include "SpellChecker.h"
+#include "github/progress_bar.hpp"
 #include <vector>
-#include <string>
 #include <iostream>
+#include <thread>
 
 using std::vector;
 using std::string;
 using std::cout;
+using std::thread;
 
-void Runner::calculate(const unsigned long start, const unsigned long end, const vector<string> &inputWords,
-                       const vector<std::string> &correctWords) {
+std::vector<std::string> Runner::getCorrectWords() {
+    return _correctWords;
+}
 
-    auto _correctWords = new vector<string> {};
+void Runner::calculateWithoutProgressBar() {
+    string current{};
+    for (auto iter = _inputWords.begin(); iter < _inputWords.end(); ++iter) {
+        current = *iter;
+        if (SpellChecker::isCorrect(current, englishWords)) {
+            //cout << Colors::GREEN << current << Colors::RESET << "\combinationsNumber";
+            _correctWords.push_back(current);
+        }
 
-    if (end >= inputWords.capacity()) {
-        cout << Colors::RED << "Error running calculate! The end point is bigger than the overall capacity of the _combinations!";
+        ++processed;
     }
 
-    for (ulong i = 0; i <= end; ++i) {
-        string w = inputWords[i];
+    _isFinished = true;
+}
+
+void Runner::calculateWithProgressBar() {
+    ProgressBar pb(_maximumCombinations, "Calculating possible combinations...", cout);
+
+    string current{};
+    for (auto iter = _inputWords.begin(); iter < _inputWords.end(); ++iter) {
+        current = *iter;
+        if (SpellChecker::isCorrect(current, _englishWords)) {
+            //cout << Colors::GREEN << current << Colors::RESET << "\combinationsNumber";
+            _correctWords.push_back(current);
+        }
+
+        ++processed;
+
+        pb.Progressed(processed);
+    }
+
+    _isFinished = true;
+}
+
+void Runner::start() {
+    thread t(&Runner::calculateWithProgressBar, this);
+    t.detach();
+}
+
+void Runner::waitForFinish() const {
+    while (!_isFinished) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 
-bool Runner::isWord(std::string word) {
+Runner::Runner(const vector<string> &englishWords_, const vector<string> &inputWords) : _englishWords(
+        englishWords_), _inputWords(inputWords) {
+    _isFinished = false;
+    _maximumCombinations = 0;
+}
 
-
-    return false;
+Runner::Runner(const vector<string> &englishWords_, const vector<string> &inputWords,
+               unsigned int maximumCombinations)  : _englishWords(englishWords_), _inputWords(inputWords),
+               _maximumCombinations(maximumCombinations){
+    _isFinished = false;
 }
