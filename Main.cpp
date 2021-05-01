@@ -122,22 +122,35 @@ int main(const int argc, const char* argv[]) {
         t.join();
     } */
 
-    vector<string> thread1Words{allCombinations.begin(), allCombinations.begin() + (1 * wordsPerThread)};
-    Runner thread1Runner(englishWords, thread1Words, combinationsNumber);
-    thread1Runner.start();
+    vector<Runner *> runners{};
 
-    thread1Runner.waitForFinish();
-    vector<string> thread1Results = thread1Runner.getCorrectWords();
+    for (int i = 0; i < numberOfThreads; ++i) {
+        vector<string> wordsCombinations{allCombinations.begin(), allCombinations.begin() + ((i + 1) * (wordsPerThread))};
+        auto *runner = new Runner(englishWords, wordsCombinations, combinationsNumber);
+        runner->start();
 
-    cout << Colors::GREEN;
-    //for (auto iter = correctWords.begin(); iter < correctWords.end(); ++iter) {
-        //cout << *iter << "; ";
-    //}
+        runners.push_back(runner);
+    }
 
-    cout << "\n\n";
+    vector<string> correctEnglishWordFromScrambled{};
+    for (auto runnerItem = runners.begin(); runnerItem < runners.end(); ++runnerItem) {
+        auto r = *runnerItem;
+        r->waitForFinish();
 
-    for (auto item = thread1Results.begin(); item < thread1Results.end(); ++item) {
-        cout << *item << "; ";
+        auto correctWordsFromThread = r->getCorrectWords();
+        for (auto wordItem = correctWordsFromThread.begin(); wordItem < correctWordsFromThread.end(); ++wordItem) {
+            correctEnglishWordFromScrambled.push_back(*wordItem);
+        }
+    }
+
+    cout << Colors::GREEN
+         << "\n\n";
+    for (auto item = correctEnglishWordFromScrambled.begin(); item < correctEnglishWordFromScrambled.end(); ++item) {
+        cout << *item;
+
+        if (item != correctEnglishWordFromScrambled.end() - 1) {
+            cout << "; ";
+        }
     }
 
     cout << std::endl;
