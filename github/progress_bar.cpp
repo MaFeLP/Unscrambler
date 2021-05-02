@@ -46,8 +46,11 @@ int ProgressBar::GetConsoleWidth(){
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
         width = csbi.srWindow.Right - csbi.srWindow.Left;
     #else
-        struct winsize win{};
-        if (ioctl(0, TIOCGWINSZ, &win) == -1 || ioctl(0, TIOCGWINSZ, &win) == 0) {
+        struct winsize win;
+        if (ioctl(0, TIOCGWINSZ, &win) == -1
+            // Uncomment the following line, when testing in CLion
+            // || ioctl(0, TIOCGWINSZ, &win) == 0
+                ) {
             width = DEFAULT_WIDTH;
         } else {
             width = win.ws_col;

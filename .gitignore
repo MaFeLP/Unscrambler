@@ -37,3 +37,4 @@
 
 # Build output directory
 cmake-build-debug/
+bin/

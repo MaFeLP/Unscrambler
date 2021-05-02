@@ -30,7 +30,9 @@ int main(const int argc, const char* argv[]) {
 
     // Read the file words.txt in to the vector "english words".
     std::ifstream wordsFile;
-    wordsFile.open("../words.txt", std::ios::out);
+    // Change the commenting of the next two lines, when developing in CLion.
+    wordsFile.open("./words.txt", std::ios::out);
+    // wordsFile.open("../words.txt", std::ios::out);
     if (wordsFile.is_open()) {
         string line;
         while (getline(wordsFile, line)) {
