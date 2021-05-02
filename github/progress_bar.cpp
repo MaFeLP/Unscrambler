@@ -46,7 +46,7 @@ int ProgressBar::GetConsoleWidth(){
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
         width = csbi.srWindow.Right - csbi.srWindow.Left;
     #else
-        struct winsize win;
+        struct winsize win{};
         if (ioctl(0, TIOCGWINSZ, &win) == -1 || ioctl(0, TIOCGWINSZ, &win) == 0) {
             width = DEFAULT_WIDTH;
         } else {
@@ -57,7 +57,7 @@ int ProgressBar::GetConsoleWidth(){
     return width;
 }
 
-int ProgressBar::GetBarLength(){
+int ProgressBar::GetBarLength() const{
 
 	// get console width and according adjust the length of the progress bar
 

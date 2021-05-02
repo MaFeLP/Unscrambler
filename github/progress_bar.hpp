@@ -25,7 +25,7 @@ public:
     const static int DEFAULT_WIDTH;
 
     ProgressBar();
-    ProgressBar(unsigned long n_, const char *description_="", std::ostream& out_=std::cerr);
+    explicit ProgressBar(unsigned long n_, const char *description_="", std::ostream& out_=std::cerr);
 
     void SetFrequencyUpdate(unsigned long frequency_update_);
     void SetStyle(const char* unit_bar_, const char* unit_space_);		
@@ -44,8 +44,8 @@ private:
     const char *unit_space;
 		
     void ClearBarField();
-    int GetConsoleWidth();
-    int GetBarLength();
+    static int GetConsoleWidth();
+    int GetBarLength() const;
 
 };
 

@@ -5,14 +5,13 @@
 #include "Main.h"
 #include "Colors.h"
 #include "Runner.h"
-#include <sys/ioctl.h>
-#include <unistd.h>
+#include "SpellChecker.h"
+#include "Combinations.h"
+
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <thread>
-#include "SpellChecker.h"
-#include "Combinations.h"
 
 using std::cout;
 using std::cin;
@@ -47,17 +46,17 @@ int main(const int argc, const char* argv[]) {
             << Colors::YELLOW << ":: " << Colors::RESET << "words.txt contains "
             << Colors::EFFECT_UNDERLINED << Colors::LIGHT_GRAY << englishWords.capacity()
             << Colors::RESET_UNDERLINED << Colors::RESET << " words!"
-            << "\n";
-            //<< "Please enter the number of threads to work with: ";
+            << "\n"
+            << "Please enter the number of threads to work with: ";
 
     // Ask the user for the number of threads he/she wants to use: currently not available!
     int numberOfThreads = 1;
-/*    cin >> numberOfThreads;
+    cin >> numberOfThreads;
     cout    << "\n"
             << Colors::YELLOW << ":: " << Colors::RESET << "Using "
             << Colors::LIGHT_GRAY << numberOfThreads
             << Colors::RESET << " threads."
-            << "\n\n"; */
+            << "\n\n";
 
     // Creates all possible combinations.
     auto combinations = new Combinations{};
@@ -76,15 +75,58 @@ int main(const int argc, const char* argv[]) {
 
     // Initializes and starts the threads.
     vector<Runner *> runners{};
-    for (int i = 0; i < numberOfThreads; ++i) {
-        // Creates a sublist of combinations of the words, each individual thread should handle.
-        vector<string> wordsCombinations{allCombinations.begin(), allCombinations.begin() + ((i + 1) * (wordsPerThread))};
+    if (numberOfThreads <= 1) {
         // Creates a runner with this list (handles the threads).
-        auto *runner = new Runner(englishWords, wordsCombinations, combinationsNumber);
+        auto *runner = new Runner(englishWords, allCombinations, combinationsNumber, 1);
         // Start the prepared thread.
         runner->start();
         // Add this thread to the vector of thread pointers.
         runners.push_back(runner);
+    } else {
+        auto wordStart = allCombinations.begin();
+        auto wordEnd = wordStart + wordsPerThread;
+        auto wordStartInt = 0;
+        auto wordEndInt = wordStartInt + wordsPerThread;
+        for (int threadNumber = 1; threadNumber <= numberOfThreads; ++threadNumber) {
+            if (threadNumber == 1) {
+                // Creates a sublist of combinations of the words, each individual thread should handle.
+                vector<string> wordsCombinations{allCombinations.begin(), wordEnd};
+                // Creates a runner with this list (handles the threads).
+                auto *runner = new Runner(englishWords, wordsCombinations, combinationsNumber, numberOfThreads);
+                // Start the prepared thread.
+                runner->start();
+                // Add this thread to the vector of thread pointers.
+                runners.push_back(runner);
+
+                wordStart += wordsPerThread;
+                wordEnd += wordsPerThread;
+                wordStartInt += wordsPerThread;
+                wordEndInt += wordsPerThread;
+            } else if (threadNumber == numberOfThreads) {
+                // Creates a sublist of combinations of the words, each individual thread should handle.
+                vector<string> wordsCombinations{wordStart, allCombinations.end()};
+                // Creates a runner with this list (handles the threads).
+                auto *runner = new Runner(englishWords, wordsCombinations);
+                // Start the prepared thread.
+                runner->start();
+                // Add this thread to the vector of thread pointers.
+                runners.push_back(runner);
+            } else {
+                // Creates a sublist of combinations of the words, each individual thread should handle.
+                vector<string> wordsCombinations{wordStart, wordEnd};
+                // Creates a runner with this list (handles the threads).
+                auto *runner = new Runner(englishWords, wordsCombinations);
+                // Start the prepared thread.
+                runner->start();
+                // Add this thread to the vector of thread pointers.
+                runners.push_back(runner);
+
+                wordStart += wordsPerThread;
+                wordEnd += wordsPerThread;
+                wordStartInt += wordsPerThread;
+                wordEndInt += wordsPerThread;
+            }
+        }
     }
 
     // Initializes the vector of correct english words, each thread has gathered.

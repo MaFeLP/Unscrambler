@@ -21,6 +21,8 @@ class Runner {
     /// The maximum amount of combinations that the progress bar should display.
     /// Is 0, if the thread does not handle a progress bar.
     unsigned int _maximumCombinations{};
+    ///
+    unsigned int _numberOfThreads{};
 public:
     void calculateWithProgressBar();
 
@@ -34,8 +36,8 @@ public:
 
     explicit Runner(const std::vector<std::string> &englishWords_, const std::vector<std::string> &inputWords);
 
-    explicit Runner(const std::vector<std::string> &englishWords, const std::vector<std::string> &inputWords,
-           unsigned int maximumCombinations);
+    explicit Runner(const std::vector<std::string> &englishWords_, const std::vector<std::string> &inputWords,
+           const unsigned int &maximumCombinations, const unsigned int &numberOfThreads);
 };
 
 #endif //UNSCRAMBLER_RUNNER_H

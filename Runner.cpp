@@ -26,7 +26,7 @@ void Runner::calculateWithoutProgressBar() {
     // iterates over each word in this vector and then checks, if it is an english word.
     for (auto iter = _inputWords.begin(); iter < _inputWords.end(); ++iter) {
         current = *iter;
-        if (SpellChecker::isCorrect(current, englishWords))
+        if (SpellChecker::isCorrect(current, _englishWords))
             _correctWords.push_back(current);
         // Increments the counter for the progress bar.
         ++processed;
@@ -47,6 +47,7 @@ void Runner::calculateWithProgressBar() {
         if (SpellChecker::isCorrect(current, _englishWords))
             _correctWords.push_back(current);
         // Increments the counter for the progress bar.
+        // processed += _numberOfThreads;
         ++processed;
         // Updates the progress bar
         pb.Progressed(processed);
@@ -57,12 +58,12 @@ void Runner::calculateWithProgressBar() {
 
 /// Starts a new thread, which searches for matches of combinations and english words.
 void Runner::start() {
-    thread t;
+    thread* t;
     if (_maximumCombinations != 0)
-        t = thread(&Runner::calculateWithProgressBar, this);
+        t = new thread(&Runner::calculateWithProgressBar, this);
     else
-        t = thread(&Runner::calculateWithoutProgressBar, this);
-    t.detach();
+        t = new thread(&Runner::calculateWithoutProgressBar, this);
+    t->detach();
 }
 
 /// The method, that is in infinitive loop, until the thread finishes.
@@ -80,14 +81,17 @@ Runner::Runner(const vector<string> &englishWords_, const vector<string> &inputW
         englishWords_), _inputWords(inputWords) {
     _isFinished = false;
     _maximumCombinations = 0;
+    _numberOfThreads = 0;
 }
 
 /// The constructor, that creates a new Runner, whose thread does handle the progress bar.
 /// \param englishWords_ The dictionary of english words, read in at the start of the program.
 /// \param inputWords The words this thread should cover.
 /// \param maximumCombinations The maximum combinations of all words.
-Runner::Runner(const vector<string> &englishWords_, const vector<string> &inputWords,
-               unsigned int maximumCombinations)  : _englishWords(englishWords_), _inputWords(inputWords),
-               _maximumCombinations(maximumCombinations){
+/// \param numberOfThreads The number of threads that will be used.
+Runner::Runner(const vector<std::string> &englishWords_, const vector<std::string> &inputWords,
+               const unsigned int &maximumCombinations, const unsigned int &numberOfThreads) :
+                        _englishWords(englishWords_), _inputWords(inputWords), _maximumCombinations(maximumCombinations),
+                        _numberOfThreads(numberOfThreads) {
     _isFinished = false;
 }
