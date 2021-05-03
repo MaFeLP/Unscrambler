@@ -70,3 +70,9 @@ cmake CMakeLists.txt
 ```bash
 make
 ```
+
+
+## Other open source projects used in this project
+- [meganz/mingw-std-threads](https://github.com/meganz/mingw-std-threads) - Used for multihreading in windows.
+- [ekg/cpp_progress_bar](https://github.com/ekg/cpp_progress_bar) - Used to display the progress bar.
+- [dwyl/english-words](https://github.com/dwyl/english-words/) - The dictionary which contains the english words.
