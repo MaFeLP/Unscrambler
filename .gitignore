@@ -37,6 +37,12 @@
 # Visual Studio files
 .vs/
 
+# CMake outputs
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Unscrambler
+
 # Build output directory
 cmake-build-debug/
 bin/
