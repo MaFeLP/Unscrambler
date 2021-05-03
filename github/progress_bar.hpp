@@ -5,10 +5,12 @@
 #ifndef _PROGRESS_BAR_
 #define _PROGRESS_BAR_
 
+#include <windows.h>
+
 #ifdef _WINDOWS
 #include <windows.h>
 #else
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
 #endif
 
 #include <iostream>

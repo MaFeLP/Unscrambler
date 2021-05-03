@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <thread>
+#include "github/threads/mingw.thread.h"
 
 using std::cout;
 using std::cin;
@@ -166,7 +166,11 @@ int main(const int argc, const char* argv[]) {
          << Colors::LIGHT_GRAY << "Unscrambler made by MaFeLP (https://mafelp.githu.io/)!"
                                << "\nThanks for using it!"
          << Colors::RESET
+         << "\n\nPress any key to continue... "
          << std::endl;
+
+    string null{};
+    cin >> null;
 
     return 0;
 }

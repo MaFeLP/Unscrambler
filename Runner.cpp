@@ -8,7 +8,7 @@
 #include "github/progress_bar.hpp"
 #include <vector>
 #include <iostream>
-#include <thread>
+#include "github/threads/mingw.thread.h"
 
 using std::vector;
 using std::string;
