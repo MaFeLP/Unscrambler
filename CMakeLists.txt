@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 project(Unscrambler)
 
+set(CMAKE_C_COMPILER /usr/bin/gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(.)
