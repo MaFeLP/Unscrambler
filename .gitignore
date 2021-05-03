@@ -34,6 +34,8 @@
 # IntelliJ aka. CLion files
 .idea/
 
+# Visual Studio files
+.vs/
 
 # Build output directory
 cmake-build-debug/
