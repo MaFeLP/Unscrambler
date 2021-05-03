@@ -45,6 +45,7 @@ A C++ program that creates all possible options of a given word and checks if it
 
 ## Building from source
 ⚠️⚠️ Only continue from here, if you know, what you are doing ⚠️⚠️ <br><br>
+### Linux
 1. Get the source files by either using git or getting the files, by downloading the zip Archive and extracting it.
 ```bash
 git clone https://github.com/MaFeLP/Unscrambler.git
@@ -59,5 +60,21 @@ cmake CMakeLists.txt
 
 3. Build the binary with the following command:
 ```bash
+make
+```
+
+### MacOS
+1. Install [Xcode](https://apps.apple.com/us/app/xcode/id497799835).
+2. Install [cmake](https://cmake.org/download/).
+3. Open a Terminal, by pressing `Command` + `Spacebar` on your keyboard, typing `terminal` and hitting enter.
+4. Get the source files with the following commands:
+```bash
+git clone https://github.com/MaFeLP/Unscrambler.git
+cd Unscrambler/
+```
+
+5. Create a makefile and build the executable with the following commands:
+```bash
+/Applications/CMake.app/Contents/bin/cmake CMakeLists.txt
 make
 ```
